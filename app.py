@@ -5,76 +5,80 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from statistics import mode
 
-st.set_page_config(layout="wide", page_title="Statistik Produksi Harian - Teknik Industri", page_icon="📊")
+# Konfigurasi halaman
+st.set_page_config(page_title="Statistik Produksi Harian", layout="wide", page_icon="📊")
 
-# UI Header
-st.markdown("<h1 style='text-align: center; color: white;'>📦 Statistik Produksi Harian - Teknik Industri</h1>", unsafe_allow_html=True)
-st.markdown("<h4 style='text-align: center; color: gray;'>Aplikasi Simulasi Statistik Deskriptif - UAS</h4>", unsafe_allow_html=True)
+# Header
+st.markdown("<h1 style='text-align: center; color: #00BFFF;'>📦 Statistik Produksi Harian</h1>", unsafe_allow_html=True)
+st.markdown("<h4 style='text-align: center; color: #888;'>Aplikasi Simulasi Statistik Deskriptif - Teknik Industri</h4>", unsafe_allow_html=True)
+st.markdown("---")
 
-# Sidebar
-st.sidebar.title("Input Data Produksi")
-data_option = st.sidebar.radio("Pilih Metode Input:", ("Manual", "Upload CSV"))
+# Sidebar input
+st.sidebar.title("📥 Input Data Produksi")
+input_mode = st.sidebar.radio("Pilih metode input:", ["Manual", "Upload CSV"])
 
-# Load data
-if data_option == "Manual":
+if input_mode == "Manual":
     st.sidebar.subheader("Masukkan Data Produksi Harian per Shift")
     dates = [f"2025-07-{str(i).zfill(2)}" for i in range(1, 8)]
     manual_data = []
-    for tanggal in dates:
-        shift1 = st.sidebar.number_input(f"{tanggal} - Shift 1", 0, 1000, 100)
-        shift2 = st.sidebar.number_input(f"{tanggal} - Shift 2", 0, 1000, 120)
-        shift3 = st.sidebar.number_input(f"{tanggal} - Shift 3", 0, 1000, 110)
-        manual_data.append([tanggal, shift1, shift2, shift3])
+    for tgl in dates:
+        s1 = st.sidebar.number_input(f"{tgl} - Shift 1", 0, 1000, 100)
+        s2 = st.sidebar.number_input(f"{tgl} - Shift 2", 0, 1000, 120)
+        s3 = st.sidebar.number_input(f"{tgl} - Shift 3", 0, 1000, 110)
+        manual_data.append([tgl, s1, s2, s3])
     df = pd.DataFrame(manual_data, columns=["Tanggal", "Shift 1", "Shift 2", "Shift 3"])
 
 else:
-    uploaded_file = st.sidebar.file_uploader("Upload File CSV", type=["csv"])
-    if uploaded_file is not None:
+    uploaded_file = st.sidebar.file_uploader("Upload file CSV", type="csv")
+    if uploaded_file:
         df = pd.read_csv(uploaded_file)
     else:
-        st.warning("Harap unggah file CSV untuk melanjutkan.")
+        st.warning("Silakan unggah file CSV untuk melanjutkan.")
         st.stop()
 
-# Perhitungan Statistik
-df_melt = df.melt(id_vars=["Tanggal"], var_name="Shift", value_name="Output")
-output_values = df_melt["Output"]
+# Menampilkan data
+st.subheader("📋 Tabel Data Produksi")
+st.dataframe(df, use_container_width=True)
 
+# Persiapan data untuk statistik
+df_melt = df.melt(id_vars=["Tanggal"], var_name="Shift", value_name="Output")
+values = df_melt["Output"]
+
+# Statistik deskriptif
 try:
     stats = {
-        "Mean": np.mean(output_values),
-        "Median": np.median(output_values),
-        "Modus": mode(output_values),
-        "Varians": np.var(output_values, ddof=1),
-        "Standar Deviasi": np.std(output_values, ddof=1)
+        "Rata-rata (Mean)": np.mean(values),
+        "Median": np.median(values),
+        "Modus": mode(values),
+        "Varians": np.var(values, ddof=1),
+        "Standar Deviasi": np.std(values, ddof=1)
     }
 except:
-    st.error("Terjadi kesalahan saat menghitung statistik. Pastikan data valid.")
+    st.error("Data bermasalah atau tidak lengkap.")
     st.stop()
 
-# Tampilkan Tabel Statistik
-st.subheader("📋 Tabel Statistik Produksi")
-st.dataframe(df.style.highlight_max(axis=0))
-
-st.markdown("### 📊 Hasil Statistik Deskriptif")
-for key, val in stats.items():
-    st.write(f"**{key}**: {val:.2f}")
+# Tampilkan statistik
+st.subheader("📊 Statistik Deskriptif")
+st.write(pd.DataFrame.from_dict(stats, orient='index', columns=["Nilai"]).round(2))
 
 # Visualisasi
 col1, col2 = st.columns(2)
+
 with col1:
-    st.markdown("#### Histogram Produksi")
+    st.markdown("### Histogram Produksi")
     fig1, ax1 = plt.subplots()
-    sns.histplot(output_values, bins=10, kde=True, ax=ax1, color='skyblue')
+    sns.histplot(values, bins=10, kde=True, ax=ax1, color="#00BFFF")
     ax1.set_xlabel("Output Produksi")
+    ax1.set_ylabel("Frekuensi")
     st.pyplot(fig1)
 
 with col2:
-    st.markdown("#### Boxplot Produksi")
+    st.markdown("### Boxplot Produksi")
     fig2, ax2 = plt.subplots()
-    sns.boxplot(y=output_values, color='orange', ax=ax2)
+    sns.boxplot(y=values, ax=ax2, color="#00BFFF")
     ax2.set_ylabel("Output Produksi")
     st.pyplot(fig2)
 
 # Footer
 st.markdown("---")
-st.markdown("<center><small>Dikembangkan untuk UAS Aplikasi Statistik - Teknik Industri | @ardhie06</small></center>", unsafe_allow_html=True)
+st.markdown("<center><small>Dikembangkan oleh Mahasiswa Teknik Industri untuk UAS Aplikasi Statistik Deskriptif</small></center>", unsafe_allow_html=True)
