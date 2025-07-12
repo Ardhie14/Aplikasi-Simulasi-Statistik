@@ -6,16 +6,12 @@ import matplotlib.pyplot as plt
 from scipy import stats
 import os
 
-# =======================
-# SETUP HALAMAN
-# =======================
 st.set_page_config(page_title="Simulasi Statistik Deskriptif", layout="centered")
 
 # =======================
 # FUNGSI BANTU
 # =======================
 def hitung_statistik(data):
-    """Mengembalikan dictionary statistik deskriptif"""
     mean_val = np.mean(data)
     median_val = np.median(data)
     mode_val = stats.mode(data, keepdims=True)[0][0]
@@ -30,7 +26,6 @@ def hitung_statistik(data):
     }
 
 def tampilkan_tabel_statistik(stats_dict):
-    """Menampilkan dataframe statistik dalam Streamlit"""
     df_result = pd.DataFrame({
         "Ukuran Statistik": list(stats_dict.keys()),
         "Nilai": list(stats_dict.values())
@@ -50,7 +45,6 @@ def tampilkan_boxplot(data):
     st.pyplot(fig2)
 
 def buat_dataset_numerik():
-    """Otomatis membuat dataset contoh jika belum ada"""
     nama_file = "data_numerik.csv"
     if not os.path.exists(nama_file):
         data = {
@@ -70,34 +64,46 @@ st.sidebar.markdown("""
 Aplikasi ini menghitung dan memvisualisasikan statistik deskriptif dasar:
 
 **Ukuran yang dihitung:**
-- Mean (Rata-rata)
+- Mean
 - Median
 - Modus
 - Varians
 - Standar Deviasi
 
 **Fitur Input:**
-- Input data manual
+- Input data manual (nama, nilai)
 - Upload file CSV
+- Gunakan dataset otomatis
 
 **Output:**
-- Tabel hasil statistik
-- Grafik histogram & boxplot
+- Tabel statistik
+- Histogram dan boxplot
 """)
 
 st.title("📈 Aplikasi Simulasi Statistik Deskriptif")
 
-# Pilihan metode input
-input_mode = st.radio("Pilih metode input data:", ["Input Manual", "Upload File CSV", "Gunakan Contoh Otomatis"])
+# PILIHAN INPUT
+input_mode = st.radio("Pilih metode input data:", ["Input Manual (Nama,Nilai)", "Upload File CSV", "Gunakan Contoh Otomatis"])
 
 data = None
 
-if input_mode == "Input Manual":
-    manual_input = st.text_area("Masukkan data numerik (pisahkan dengan koma):", "10, 15, 12, 18, 20, 20, 21")
+if input_mode == "Input Manual (Nama,Nilai)":
+    manual_input = st.text_area("Masukkan data (format: Nama,Nilai per baris):", "Andi,78\nBudi,85\nCici,90")
+    
     try:
-        data = np.array([float(i.strip()) for i in manual_input.split(",") if i.strip() != ""])
-    except:
-        st.error("Format data tidak valid. Gunakan angka yang dipisahkan koma.")
+        rows = [row.strip() for row in manual_input.strip().split("\n") if row.strip()]
+        nama, nilai = [], []
+        for row in rows:
+            parts = row.split(",")
+            if len(parts) != 2:
+                raise ValueError("Format harus: Nama,Nilai")
+            nama.append(parts[0].strip())
+            nilai.append(float(parts[1].strip()))
+        df = pd.DataFrame({"Nama": nama, "Nilai": nilai})
+        st.dataframe(df)
+        data = df["Nilai"].values
+    except Exception as e:
+        st.error(f"Terjadi kesalahan: {e}")
         st.stop()
 
 elif input_mode == "Upload File CSV":
@@ -110,11 +116,12 @@ elif input_mode == "Upload File CSV":
             st.stop()
         selected_col = st.selectbox("Pilih kolom numerik:", numeric_cols)
         data = df[selected_col].dropna().values
+        st.dataframe(df)
     else:
-        st.warning("Silakan upload file CSV untuk melanjutkan.")
+        st.warning("Silakan upload file CSV.")
         st.stop()
 
-else:  # Gunakan data contoh
+else:  # Data otomatis
     nama_file = buat_dataset_numerik()
     df = pd.read_csv(nama_file)
     st.success(f"Dataset otomatis '{nama_file}' berhasil dimuat.")
@@ -122,20 +129,18 @@ else:  # Gunakan data contoh
     data = df["Nilai"].values
 
 # =======================
-# OUTPUT STATISTIK & VISUALISASI
+# OUTPUT
 # =======================
-
 st.subheader("📊 Hasil Statistik")
 hasil_statistik = hitung_statistik(data)
 tampilkan_tabel_statistik(hasil_statistik)
 
 st.subheader("📉 Visualisasi Data")
 tab1, tab2 = st.tabs(["Histogram", "Boxplot"])
-
 with tab1:
     tampilkan_histogram(data)
 with tab2:
     tampilkan_boxplot(data)
 
 st.markdown("---")
-st.caption("Dibuat untuk memenuhi UAS - Aplikasi Simulasi Statistik Deskriptif | Oleh Mahasiswa Teknik")
+st.caption("Dibuat untuk memenuhi UAS - Aplikasi Simulasi Statistik Deskriptif | Teknik | 2025")
