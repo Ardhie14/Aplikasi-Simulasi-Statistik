@@ -1,3 +1,4 @@
+
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -23,9 +24,9 @@ with st.sidebar:
 # --------------------------
 st.markdown("""
     <style>
-        .main {background-color: #f5f5f5;}
-        h1, h2, h3 {color: #1B2631;}
-        .stApp {padding: 2rem;}
+        .main {background-color:#f5f5f5;}
+        h1, h2, h3 {color:#1B2631;}
+        .stApp {padding:2rem;}
     </style>
 """, unsafe_allow_html=True)
 
@@ -37,12 +38,12 @@ if selected == "🏭 Beranda":
     st.markdown("### Produk: **Gearbox Motor** – Analisis Output Produksi per Shift (7 Hari)")
     st.markdown("""
     Aplikasi ini digunakan untuk menganalisis data **jumlah unit yang diproduksi** setiap hari selama satu minggu.
-    
+
     Cocok digunakan untuk:
     - Kontrol produksi harian
     - Evaluasi efisiensi shift kerja
     - Monitoring variasi produksi
-    
+
     Gunakan menu di samping untuk memulai analisis.
     """)
 
@@ -90,29 +91,38 @@ elif selected == "📊 Analisis Produksi":
     # --------------------------
     # Statistik Deskriptif
     # --------------------------
-    st.subheader("📌 Statistik Deskriptif Produksi")
-    st.write(f"**Mean (Rata-rata):** {np.mean(df['Unit Produksi']):.2f} unit")
-    st.write(f"**Median:** {np.median(df['Unit Produksi']):.2f} unit")
-    try:
-        st.write(f"**Modus:** {mode(df['Unit Produksi'])} unit")
-    except:
-        st.write("**Modus:** Tidak ada nilai yang dominan (multimodal)")
-    st.write(f"**Varians:** {np.var(df['Unit Produksi'], ddof=1):.2f}")
-    st.write(f"**Standar Deviasi:** {np.std(df['Unit Produksi'], ddof=1):.2f}")
+    st.markdown("### 📌 Statistik Deskriptif Produksi")
+    st.markdown(f"""
+    <div style='background-color:#EBF5FB; padding: 15px; border-radius: 10px'>
+    <h4 style='color:#2E86C1;'>📊 Rangkuman Statistik Gearbox Motor</h4>
+    <ul>
+        <li><b>Mean (Rata-rata):</b> {np.mean(df['Unit Produksi']):.2f} unit</li>
+        <li><b>Median:</b> {np.median(df['Unit Produksi']):.2f} unit</li>
+        <li><b>Modus:</b> {"Tidak ada (multimodal)" if len(set(df['Unit Produksi'])) == len(df['Unit Produksi']) else mode(df['Unit Produksi'])}</li>
+        <li><b>Varians:</b> {np.var(df['Unit Produksi'], ddof=1):.2f}</li>
+        <li><b>Standar Deviasi:</b> {np.std(df['Unit Produksi'], ddof=1):.2f}</li>
+    </ul>
+    </div>
+    """, unsafe_allow_html=True)
 
     # --------------------------
     # Visualisasi
     # --------------------------
-    st.subheader("📊 Visualisasi Produksi Harian")
+    st.markdown("### 📊 Visualisasi Produksi Harian")
+    st.markdown("Analisis grafik berikut dapat membantu mendeteksi pola distribusi dan penyebaran produksi harian.")
 
     col1, col2 = st.columns(2)
 
     with col1:
-        st.markdown("#### Histogram Produksi")
-        fig_hist = px.histogram(df, x="Unit Produksi", nbins=7, title="Distribusi Output Produksi")
-        st.plotly_chart(fig_hist, use_container_width=True)
+        with st.container():
+            st.markdown("#### 📉 Histogram Produksi")
+            st.caption("Menunjukkan distribusi frekuensi output produksi dalam satu minggu.")
+            fig_hist = px.histogram(df, x="Unit Produksi", nbins=7, title="Distribusi Output Produksi")
+            st.plotly_chart(fig_hist, use_container_width=True)
 
     with col2:
-        st.markdown("#### Boxplot Produksi")
-        fig_box = px.box(df, y="Unit Produksi", title="Penyebaran Produksi Harian")
-        st.plotly_chart(fig_box, use_container_width=True)
+        with st.container():
+            st.markdown("#### 📦 Boxplot Produksi")
+            st.caption("Menunjukkan persebaran dan potensi outlier pada data produksi.")
+            fig_box = px.box(df, y="Unit Produksi", title="Penyebaran Produksi Harian")
+            st.plotly_chart(fig_box, use_container_width=True)
