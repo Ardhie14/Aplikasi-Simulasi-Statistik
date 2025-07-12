@@ -80,7 +80,7 @@ input_mode = st.radio("Pilih metode input data:", ["Input Manual", "Upload File 
 data = None
 
 if input_mode == "Input Manual":
-    manual_input = st.text_area("Masukkan data numerik (pisahkan dengan koma):", "10, 15, 12, 18, 20, 20, 21")
+    manual_input = st.text_area("Masukkan data numerik (pisahkan dengan koma):", "12, 15, 14, 16, 15, 14, 16, 18")
     try:
         data = np.array([float(i.strip()) for i in manual_input.split(",") if i.strip() != ""])
     except:
