@@ -1,194 +1,115 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import seaborn as sns
-import matplotlib.pyplot as plt
-from scipy import stats
-import os
+import plotly.express as px
+from statistics import mode
+from streamlit_option_menu import option_menu
 
-st.set_page_config(page_title="Statistik Teknik Mesin", layout="centered")
+st.set_page_config(page_title="Statistik Deskriptif Industri", layout="wide")
 
-# =======================
-# FUNGSI PERHITUNGAN
-# =======================
-def hitung_statistik(data):
-    mean_val = np.mean(data)
-    median_val = np.median(data)
-    mode_val = stats.mode(data, keepdims=True)[0][0]
-    var_val = np.var(data, ddof=1)
-    std_val = np.std(data, ddof=1)
-    return {
-        "Mean": mean_val,
-        "Median": median_val,
-        "Modus": mode_val,
-        "Varians": var_val,
-        "Standar Deviasi": std_val
-    }
+# --------------------------
+# Sidebar Navigation
+# --------------------------
+with st.sidebar:
+    selected = option_menu(
+        "Menu",
+        ["🏭 Beranda", "📊 Statistik", "📈 Visualisasi"],
+        icons=["house", "bar-chart", "graph-up"],
+        default_index=0,
+    )
 
-def tampilkan_tabel_statistik(stats_dict):
-    df_result = pd.DataFrame({
-        "Ukuran Statistik": list(stats_dict.keys()),
-        "Nilai": list(stats_dict.values())
-    })
-    st.dataframe(df_result, use_container_width=True)
+# --------------------------
+# Styling Header
+# --------------------------
+st.markdown("""
+    <style>
+        .main {background-color: #f5f5f5;}
+        h1, h2, h3 {color: #154360;}
+        .stApp {padding: 2rem;}
+    </style>
+""", unsafe_allow_html=True)
 
-def tampilkan_histogram(data):
-    fig, ax = plt.subplots()
-    sns.histplot(data, kde=True, bins=10, color="steelblue", ax=ax)
-    ax.set_title("Histogram Data Pengujian Mesin")
-    st.pyplot(fig)
+# --------------------------
+# Halaman 1: Beranda
+# --------------------------
+if selected == "🏭 Beranda":
+    st.title("📦 Aplikasi Statistik Deskriptif")
+    st.markdown("### Teknik Industri – Analisis Data Produksi, Kualitas, dan Efisiensi")
+    st.markdown("""
+    Aplikasi ini dirancang untuk membantu analisis data statistik deskriptif pada berbagai proses industri, seperti:
+    - Waktu produksi unit
+    - Jumlah produk cacat
+    - Setup mesin
+    - Output produksi
+    - Waktu tunggu logistik
 
-def tampilkan_boxplot(data):
-    fig2, ax2 = plt.subplots()
-    sns.boxplot(data, color="lightcoral", ax=ax2)
-    ax2.set_title("Boxplot Pengujian")
-    st.pyplot(fig2)
+    **Gunakan menu di samping untuk memulai analisis data Anda.**
+    """)
 
-def buat_dataset_mesin():
-    nama_file = "mesin_uji_sample.csv"
-    if not os.path.exists(nama_file):
-        data = {
-            "Parameter": ["Temperatur", "Tekanan", "Putaran", "Getaran", "Efisiensi"],
-            "Nilai": [85.0, 2.5, 1400, 0.02, 88.5]
-        }
-        df = pd.DataFrame(data)
-        df.to_csv(nama_file, index=False)
-    return nama_file
+# --------------------------
+# Halaman 2: Statistik
+# --------------------------
+elif selected == "📊 Statistik":
+    st.header("📋 Input Data Statistik Deskriptif")
 
-# =======================
-# SIDEBAR & JUDUL
-# =======================
-st.sidebar.title("🛠️ Statistik Teknik Mesin")
-st.sidebar.markdown("""
-Aplikasi ini digunakan untuk analisis statistik dari hasil pengujian sistem mekanis seperti:
+    input_type = st.radio("Pilih metode input data:", ["Input Manual", "Upload CSV"])
 
-- Uji tekanan dan temperatur
-- Efisiensi sistem termal
-- Getaran mesin
-- Kecepatan rotasi poros
-
-**Input:**  
-- Data manual (Parameter, Nilai)  
-- Upload CSV  
-- Dataset simulasi otomatis
-
-**Output:**  
-- Tabel statistik  
-- Histogram & Boxplot visualisasi
-""")
-
-st.title("📊 Simulasi Statistik Deskriptif - Teknik Mesin")
-
-# =======================
-# PENJELASAN TEORI MESIN
-# =======================
-with st.expander("📘 Konsep Statistik dalam Teknik Mesin"):
-    st.markdown(r"""
-### 🔧 Penerapan Statistik di Teknik Mesin:
-
-Statistik deskriptif digunakan untuk menganalisis hasil pengujian seperti:
-- **Temperatur operasi mesin**
-- **Tekanan fluida**
-- **Kecepatan rotasi poros**
-- **Efisiensi energi sistem**
-- **Getaran dan noise mesin**
-
----
-
-### 📐 Ukuran Statistik:
-
-- **Mean (Rata-rata)**  
-  Rumus: \( \bar{x} = \frac{1}{n} \sum_{i=1}^n x_i \)  
-  ➤ Menunjukkan rata-rata pengukuran alat.
-
-- **Median**  
-  ➤ Nilai tengah — tahan terhadap nilai ekstrem saat uji coba.
-
-- **Modus**  
-  ➤ Nilai yang sering muncul saat pengukuran berulang.
-
-- **Varians (s²)**  
-  Rumus: \( s^2 = \frac{1}{n-1} \sum (x_i - \bar{x})^2 \)  
-  ➤ Menyatakan sebaran dari hasil uji performa.
-
-- **Standar Deviasi (s)**  
-  \( s = \sqrt{s^2} \)  
-  ➤ Stabilitas data pengukuran sistem mekanik.
-
----
-
-### 📊 Visualisasi:
-- **Histogram** → distribusi hasil pengujian
-- **Boxplot** → identifikasi anomali (outlier)
-
----
-*Statistik menjadi dasar dalam proses kontrol kualitas, maintenance prediktif, dan riset sistem mekanik.*
-""")
-
-# =======================
-# INPUT PILIHAN
-# =======================
-input_mode = st.radio("Pilih metode input data:", [
-    "Input Manual (Parameter, Nilai - Mesin)",
-    "Upload File CSV",
-    "Gunakan Contoh Otomatis"
-])
-data = None
-
-if input_mode == "Input Manual (Parameter, Nilai - Mesin)":
-    manual_input = st.text_area("Masukkan data uji mesin (format: Parameter,Nilai per baris):",
-                                 "Temperatur,85.0\nTekanan,2.5\nPutaran,1400\nGetaran,0.02\nEfisiensi,88.5")
-    try:
-        rows = [row.strip() for row in manual_input.strip().split("\n") if row.strip()]
-        param, nilai = [], []
-        for row in rows:
-            parts = row.split(",")
-            if len(parts) != 2:
-                raise ValueError("Format harus: Parameter,Nilai")
-            param.append(parts[0].strip())
-            nilai.append(float(parts[1].strip()))
-        df = pd.DataFrame({"Parameter": param, "Nilai": nilai})
-        st.dataframe(df)
-        data = df["Nilai"].values
-    except Exception as e:
-        st.error(f"Terjadi kesalahan: {e}")
-        st.stop()
-
-elif input_mode == "Upload File CSV":
-    uploaded_file = st.file_uploader("Upload file CSV hasil pengujian", type=["csv"])
-    if uploaded_file is not None:
-        df = pd.read_csv(uploaded_file)
-        numeric_cols = df.select_dtypes(include=np.number).columns.tolist()
-        if not numeric_cols:
-            st.error("Tidak ditemukan kolom numerik.")
+    if input_type == "Input Manual":
+        data_input = st.text_area("Masukkan data angka (pisahkan dengan koma):", "12, 13, 12, 14, 15, 12, 13, 14")
+        try:
+            data = list(map(float, data_input.split(",")))
+            df = pd.DataFrame(data, columns=["Data"])
+        except:
+            st.error("Format data salah. Pastikan hanya angka dan koma.")
             st.stop()
-        selected_col = st.selectbox("Pilih kolom numerik:", numeric_cols)
-        data = df[selected_col].dropna().values
-        st.dataframe(df)
     else:
-        st.warning("Silakan upload file CSV.")
+        uploaded_file = st.file_uploader("Upload file CSV", type=["csv"])
+        if uploaded_file is not None:
+            df = pd.read_csv(uploaded_file)
+            if df.shape[1] > 1:
+                selected_column = st.selectbox("Pilih kolom numerik:", df.select_dtypes(include=np.number).columns)
+                df = df[[selected_column]]
+                df.columns = ["Data"]
+            else:
+                df.columns = ["Data"]
+        else:
+            st.warning("Silakan upload file CSV terlebih dahulu.")
+            st.stop()
+
+    st.success("✅ Data berhasil diproses")
+    st.write(df)
+
+    st.markdown("### 📌 Statistik Deskriptif")
+    st.write(f"**Mean (Rata-rata):** {np.mean(df['Data']):.2f}")
+    st.write(f"**Median:** {np.median(df['Data']):.2f}")
+    try:
+        st.write(f"**Modus:** {mode(df['Data'])}")
+    except:
+        st.write("**Modus:** Tidak ada nilai yang dominan (multimodal)")
+    st.write(f"**Varians:** {np.var(df['Data'], ddof=1):.2f}")
+    st.write(f"**Standar Deviasi:** {np.std(df['Data'], ddof=1):.2f}")
+
+# --------------------------
+# Halaman 3: Visualisasi
+# --------------------------
+elif selected == "📈 Visualisasi":
+    st.header("📊 Visualisasi Data")
+
+    if 'df' not in locals():
+        st.warning("Silakan input data terlebih dahulu di menu Statistik.")
         st.stop()
 
-else:
-    nama_file = buat_dataset_mesin()
-    df = pd.read_csv(nama_file)
-    st.success(f"Dataset otomatis '{nama_file}' berhasil dimuat.")
-    st.dataframe(df)
-    data = df["Nilai"].values
+    col1, col2 = st.columns(2)
 
-# =======================
-# HASIL & VISUALISASI
-# =======================
-st.subheader("📈 Hasil Statistik Pengujian")
-hasil_statistik = hitung_statistik(data)
-tampilkan_tabel_statistik(hasil_statistik)
+    with col1:
+        st.subheader("Histogram")
+        fig_hist = px.histogram(df, x="Data", nbins=10, title="Distribusi Data Produksi")
+        st.plotly_chart(fig_hist, use_container_width=True)
 
-st.subheader("📉 Visualisasi")
-tab1, tab2 = st.tabs(["Histogram", "Boxplot"])
-with tab1:
-    tampilkan_histogram(data)
-with tab2:
-    tampilkan_boxplot(data)
-
+    with col2:
+        st.subheader("Boxplot")
+        fig_box = px.box(df, y="Data", title="Penyebaran Data (Boxplot)")
+        st.plotly_chart(fig_box, use_container_width=True)
+        
 st.markdown("---")
-st.caption("Disusun untuk UAS - Aplikasi Statistik Deskriptif | Teknik Mesin | 2025")
+st.caption("Dibuat untuk UAS - Statistik Deskriptif | Artificial Intelligence | 2025")
