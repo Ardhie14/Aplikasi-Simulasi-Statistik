@@ -86,46 +86,61 @@ Aplikasi ini menghitung dan memvisualisasikan statistik deskriptif dasar:
 st.title("📈 Aplikasi Simulasi Statistik Deskriptif")
 
 # ===================
-# PENJELASAN KONSEP
+# PENJELASAN TEORI (Informatika)
 # ===================
-with st.expander("🧠 Penjelasan Konsep Statistik Deskriptif (Matematika Teknik)"):
+with st.expander("🧠 Konsep Statistik Deskriptif dalam Matematika Teknik Informatika"):
     st.markdown(r"""
-### 📌 Tujuan:
-Menganalisis kumpulan data numerik yang digunakan dalam dunia teknik seperti:
-- Hasil pengukuran sensor
-- Lama waktu proses produksi
-- Nilai efisiensi komponen
+### 🎯 Relevansi dalam Teknik Informatika:
+
+Statistik deskriptif membantu dalam:
+- **Menganalisis waktu eksekusi algoritma**
+- **Mengukur performa sistem (respon server, waktu proses)**
+- **Mengetahui sebaran error atau output dari suatu sistem**
+- **Evaluasi model Machine Learning**
+
+---
 
 ### 📐 Ukuran Statistik yang Dihitung:
 
 - **Mean (Rata-rata)**  
   Rumus: \( \bar{x} = \frac{1}{n} \sum_{i=1}^n x_i \)  
-  Menunjukkan nilai pusat dari seluruh data.
+  ➤ Menunjukkan nilai rata-rata performa atau nilai hasil uji.
 
 - **Median**  
-  Nilai di tengah data yang telah diurutkan. Cocok untuk data dengan outlier.
+  ➤ Berguna saat data mengandung outlier (misalnya data delay yang tiba-tiba tinggi).
 
 - **Modus**  
-  Nilai yang paling sering muncul dalam data.
+  ➤ Mengetahui nilai yang paling sering muncul. Berguna dalam analisis penggunaan fitur atau event logging.
 
 - **Varians (s²)**  
   Rumus: \( s^2 = \frac{1}{n-1} \sum (x_i - \bar{x})^2 \)  
-  Mengukur penyebaran data terhadap rata-rata.
+  ➤ Mengukur sebaran dari waktu eksekusi atau distribusi nilai dalam dataset.
 
 - **Standar Deviasi (s)**  
   \( s = \sqrt{s^2} \)  
-  Menyatakan seberapa jauh data menyimpang dari rata-rata.
-
-### 📊 Visualisasi:
-- **Histogram**: Menampilkan distribusi nilai
-- **Boxplot**: Menunjukkan sebaran dan outlier
+  ➤ Semakin kecil deviasi, semakin stabil performa sistem/algoritma.
 
 ---
-*Penerapan ini sangat penting dalam dunia teknik seperti kontrol kualitas, maintenance, dan pengujian performa sistem.*
+
+### 📊 Visualisasi:
+
+- **Histogram**: Menunjukkan distribusi frekuensi data log, latency, atau error.
+- **Boxplot**: Mendeteksi anomali performa atau outlier dalam hasil pengujian.
+
+---
+
+### ✅ Contoh Aplikasi Nyata:
+- Menganalisis hasil uji aplikasi web/mobile
+- Menilai stabilitas respons server API
+- Statistik evaluasi model klasifikasi atau regresi
+- Pengolahan data pengguna sistem informasi
+
+---
+*Statistik deskriptif adalah dasar penting dalam pengolahan data teknik informatika, analitik sistem, dan machine learning.*
 """)
 
 # =====================
-# PILIH INPUT
+# PILIH INPUT DATA
 # =====================
 input_mode = st.radio("Pilih metode input data:", ["Input Manual (Nama,Nilai)", "Upload File CSV", "Gunakan Contoh Otomatis"])
 data = None
@@ -156,33 +171,4 @@ elif input_mode == "Upload File CSV":
         if not numeric_cols:
             st.error("Tidak ditemukan kolom numerik dalam file.")
             st.stop()
-        selected_col = st.selectbox("Pilih kolom numerik:", numeric_cols)
-        data = df[selected_col].dropna().values
-        st.dataframe(df)
-    else:
-        st.warning("Silakan upload file CSV.")
-        st.stop()
-
-else:
-    nama_file = buat_dataset_numerik()
-    df = pd.read_csv(nama_file)
-    st.success(f"Dataset otomatis '{nama_file}' berhasil dimuat.")
-    st.dataframe(df)
-    data = df["Nilai"].values
-
-# =======================
-# HASIL & VISUALISASI
-# =======================
-st.subheader("📊 Hasil Statistik")
-hasil_statistik = hitung_statistik(data)
-tampilkan_tabel_statistik(hasil_statistik)
-
-st.subheader("📉 Visualisasi Data")
-tab1, tab2 = st.tabs(["Histogram", "Boxplot"])
-with tab1:
-    tampilkan_histogram(data)
-with tab2:
-    tampilkan_boxplot(data)
-
-st.markdown("---")
-st.caption("Dibuat untuk memenuhi UAS - Aplikasi Simulasi Statistik Deskriptif | Teknik | 2025")
+        selected_col = st.selectbox("Pilih kolom n_
