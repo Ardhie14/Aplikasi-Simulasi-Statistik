@@ -4,14 +4,16 @@ import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
 from scipy import stats
+import os
 
-# Konfigurasi halaman
+# =======================
+# SETUP HALAMAN
+# =======================
 st.set_page_config(page_title="Simulasi Statistik Deskriptif", layout="centered")
 
 # =======================
-# FUNGSI BANTU OPSIONAL
+# FUNGSI BANTU
 # =======================
-
 def hitung_statistik(data):
     """Mengembalikan dictionary statistik deskriptif"""
     mean_val = np.mean(data)
@@ -47,11 +49,22 @@ def tampilkan_boxplot(data):
     ax2.set_title("Boxplot Data")
     st.pyplot(fig2)
 
+def buat_dataset_numerik():
+    """Otomatis membuat dataset contoh jika belum ada"""
+    nama_file = "data_numerik.csv"
+    if not os.path.exists(nama_file):
+        data = {
+            "No": list(range(1, 11)),
+            "Nama": ["Andi", "Budi", "Cici", "Dina", "Eka", "Fani", "Gilang", "Hana", "Indra", "Joko"],
+            "Nilai": [78, 82, 90, 75, 88, 85, 80, 92, 84, 89]
+        }
+        df = pd.DataFrame(data)
+        df.to_csv(nama_file, index=False)
+    return nama_file
+
 # =======================
 # UI APLIKASI
 # =======================
-
-# Sidebar - Dokumentasi
 st.sidebar.title("📊 Simulasi Statistik Deskriptif")
 st.sidebar.markdown("""
 Aplikasi ini menghitung dan memvisualisasikan statistik deskriptif dasar:
@@ -72,11 +85,11 @@ Aplikasi ini menghitung dan memvisualisasikan statistik deskriptif dasar:
 - Grafik histogram & boxplot
 """)
 
-# Judul
 st.title("📈 Aplikasi Simulasi Statistik Deskriptif")
 
-# PILIHAN INPUT
-input_mode = st.radio("Pilih metode input data:", ["Input Manual", "Upload File CSV"])
+# Pilihan metode input
+input_mode = st.radio("Pilih metode input data:", ["Input Manual", "Upload File CSV", "Gunakan Contoh Otomatis"])
+
 data = None
 
 if input_mode == "Input Manual":
@@ -86,7 +99,8 @@ if input_mode == "Input Manual":
     except:
         st.error("Format data tidak valid. Gunakan angka yang dipisahkan koma.")
         st.stop()
-else:
+
+elif input_mode == "Upload File CSV":
     uploaded_file = st.file_uploader("Upload file CSV", type=["csv"])
     if uploaded_file is not None:
         df = pd.read_csv(uploaded_file)
@@ -100,23 +114,28 @@ else:
         st.warning("Silakan upload file CSV untuk melanjutkan.")
         st.stop()
 
+else:  # Gunakan data contoh
+    nama_file = buat_dataset_numerik()
+    df = pd.read_csv(nama_file)
+    st.success(f"Dataset otomatis '{nama_file}' berhasil dimuat.")
+    st.dataframe(df)
+    data = df["Nilai"].values
+
 # =======================
-# OUTPUT STATISTIK & VISUAL
+# OUTPUT STATISTIK & VISUALISASI
 # =======================
 
-# Hitung Statistik
 st.subheader("📊 Hasil Statistik")
 hasil_statistik = hitung_statistik(data)
 tampilkan_tabel_statistik(hasil_statistik)
 
-# Visualisasi
 st.subheader("📉 Visualisasi Data")
 tab1, tab2 = st.tabs(["Histogram", "Boxplot"])
+
 with tab1:
     tampilkan_histogram(data)
 with tab2:
     tampilkan_boxplot(data)
 
-# Penutup
 st.markdown("---")
 st.caption("Dibuat untuk memenuhi UAS - Aplikasi Simulasi Statistik Deskriptif | Oleh Mahasiswa Teknik")
