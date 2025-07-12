@@ -9,7 +9,7 @@ import os
 # =======================
 # SETUP HALAMAN
 # =======================
-st.set_page_config(page_title="Simulasi Statistik Deskriptif", layout="centered")
+st.set_page_config(page_title="Simulasi Statistik Deskriptif - ML", layout="centered")
 
 # =======================
 # FUNGSI BANTU
@@ -48,23 +48,22 @@ def tampilkan_boxplot(data):
     st.pyplot(fig2)
 
 def buat_dataset_numerik():
-    nama_file = "data_numerik.csv"
+    nama_file = "ml_metrics_sample.csv"
     if not os.path.exists(nama_file):
         data = {
-            "No": list(range(1, 11)),
-            "Nama": ["Andi", "Budi", "Cici", "Dina", "Eka", "Fani", "Gilang", "Hana", "Indra", "Joko"],
-            "Nilai": [78, 82, 90, 75, 88, 85, 80, 92, 84, 89]
+            "Fitur": ["Akurasi", "Presisi", "Recall", "F1-Score", "Loss"],
+            "Nilai": [0.91, 0.88, 0.84, 0.86, 0.12]
         }
         df = pd.DataFrame(data)
         df.to_csv(nama_file, index=False)
     return nama_file
 
 # =======================
-# UI APLIKASI
+# SIDEBAR & JUDUL
 # =======================
-st.sidebar.title("📊 Simulasi Statistik Deskriptif")
+st.sidebar.title("📊 Statistik Deskriptif - Machine Learning")
 st.sidebar.markdown("""
-Aplikasi ini menghitung dan memvisualisasikan statistik deskriptif dasar:
+Aplikasi ini menghitung dan memvisualisasikan statistik deskriptif untuk data hasil evaluasi model:
 
 **Ukuran yang dihitung:**
 - Mean
@@ -73,90 +72,86 @@ Aplikasi ini menghitung dan memvisualisasikan statistik deskriptif dasar:
 - Varians
 - Standar Deviasi
 
-**Fitur Input:**
-- Input data manual (nama, nilai)
-- Upload file CSV
-- Gunakan dataset otomatis
+**Input:**
+- Data manual (Fitur, Nilai)
+- File CSV
+- Dataset contoh
 
-**Output:**
-- Tabel statistik
-- Histogram dan boxplot
+**Visualisasi:**
+- Histogram & Boxplot
 """)
 
-st.title("📈 Aplikasi Simulasi Statistik Deskriptif")
+st.title("📈 Simulasi Statistik Deskriptif - Data Machine Learning")
 
-# ===================
-# PENJELASAN TEORI (Informatika)
-# ===================
-with st.expander("🧠 Konsep Statistik Deskriptif dalam Matematika Teknik Informatika"):
+# =======================
+# PENJELASAN TEORI
+# =======================
+with st.expander("🧠 Konsep Statistik Deskriptif dalam Matematika Teknik Informatika (ML)"):
     st.markdown(r"""
-### 🎯 Relevansi dalam Teknik Informatika:
+### 🎯 Relevansi dalam Machine Learning:
 
-Statistik deskriptif membantu dalam:
-- **Menganalisis waktu eksekusi algoritma**
-- **Mengukur performa sistem (respon server, waktu proses)**
-- **Mengetahui sebaran error atau output dari suatu sistem**
-- **Evaluasi model Machine Learning**
+Statistik deskriptif membantu:
+- **Evaluasi performa model (akurasi, presisi, recall, loss, dll.)**
+- **Analisis distribusi error**
+- **Preprocessing & normalisasi data**
+- **Menganalisis hasil tuning hyperparameter**
 
 ---
 
-### 📐 Ukuran Statistik yang Dihitung:
+### 📐 Ukuran Statistik:
 
 - **Mean (Rata-rata)**  
-  Rumus: \( \bar{x} = \frac{1}{n} \sum_{i=1}^n x_i \)  
-  ➤ Menunjukkan nilai rata-rata performa atau nilai hasil uji.
+  \( \bar{x} = \frac{1}{n} \sum_{i=1}^n x_i \)  
+  ➤ Rata-rata dari semua metrik.
 
 - **Median**  
-  ➤ Berguna saat data mengandung outlier (misalnya data delay yang tiba-tiba tinggi).
+  ➤ Nilai tengah, tahan terhadap outlier.
 
 - **Modus**  
-  ➤ Mengetahui nilai yang paling sering muncul. Berguna dalam analisis penggunaan fitur atau event logging.
+  ➤ Nilai paling sering muncul.
 
 - **Varians (s²)**  
-  Rumus: \( s^2 = \frac{1}{n-1} \sum (x_i - \bar{x})^2 \)  
-  ➤ Mengukur sebaran dari waktu eksekusi atau distribusi nilai dalam dataset.
+  \( s^2 = \frac{1}{n-1} \sum (x_i - \bar{x})^2 \)  
+  ➤ Mengukur sebaran metrik.
 
 - **Standar Deviasi (s)**  
   \( s = \sqrt{s^2} \)  
-  ➤ Semakin kecil deviasi, semakin stabil performa sistem/algoritma.
+  ➤ Seberapa jauh nilai menyimpang dari rata-rata.
 
 ---
 
 ### 📊 Visualisasi:
-
-- **Histogram**: Menunjukkan distribusi frekuensi data log, latency, atau error.
-- **Boxplot**: Mendeteksi anomali performa atau outlier dalam hasil pengujian.
-
----
-
-### ✅ Contoh Aplikasi Nyata:
-- Menganalisis hasil uji aplikasi web/mobile
-- Menilai stabilitas respons server API
-- Statistik evaluasi model klasifikasi atau regresi
-- Pengolahan data pengguna sistem informasi
+- **Histogram**: Distribusi nilai performa
+- **Boxplot**: Deteksi outlier dalam hasil eksperimen
 
 ---
-*Statistik deskriptif adalah dasar penting dalam pengolahan data teknik informatika, analitik sistem, dan machine learning.*
+
+*Digunakan dalam: evaluasi model, eksperimen hyperparameter, riset ML, analitik sistem cerdas.*
 """)
 
-# =====================
-# PILIH INPUT DATA
-# =====================
-input_mode = st.radio("Pilih metode input data:", ["Input Manual (Nama,Nilai)", "Upload File CSV", "Gunakan Contoh Otomatis"])
+# =======================
+# INPUT PILIHAN
+# =======================
+input_mode = st.radio("Pilih metode input data:", [
+    "Input Manual (Fitur,Nilai - ML)", 
+    "Upload File CSV", 
+    "Gunakan Contoh Otomatis"
+])
 data = None
 
-if input_mode == "Input Manual (Nama,Nilai)":
-    manual_input = st.text_area("Masukkan data (format: Nama,Nilai per baris):", "Andi,78\nBudi,85\nCici,90")
+if input_mode == "Input Manual (Fitur,Nilai - ML)":
+    manual_input = st.text_area("Masukkan data metrik ML (format: Fitur,Nilai per baris):", 
+                                 "Akurasi,0.91\nPresisi,0.88\nRecall,0.84\nF1-Score,0.86\nLoss,0.12")
     try:
         rows = [row.strip() for row in manual_input.strip().split("\n") if row.strip()]
-        nama, nilai = [], []
+        fitur, nilai = [], []
         for row in rows:
             parts = row.split(",")
             if len(parts) != 2:
-                raise ValueError("Format harus: Nama,Nilai")
-            nama.append(parts[0].strip())
+                raise ValueError("Format harus: Fitur,Nilai")
+            fitur.append(parts[0].strip())
             nilai.append(float(parts[1].strip()))
-        df = pd.DataFrame({"Nama": nama, "Nilai": nilai})
+        df = pd.DataFrame({"Fitur": fitur, "Nilai": nilai})
         st.dataframe(df)
         data = df["Nilai"].values
     except Exception as e:
@@ -200,4 +195,4 @@ with tab2:
     tampilkan_boxplot(data)
 
 st.markdown("---")
-st.caption("Dibuat untuk memenuhi UAS - Aplikasi Simulasi Statistik Deskriptif | Teknik Informatika | 2025")
+st.caption("Dibuat untuk UAS - Aplikasi Simulasi Statistik Deskriptif | Teknik Informatika | 2025")
