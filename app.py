@@ -171,4 +171,33 @@ elif input_mode == "Upload File CSV":
         if not numeric_cols:
             st.error("Tidak ditemukan kolom numerik dalam file.")
             st.stop()
-        selected_col = st.selectbox("Pilih kolom n_
+        selected_col = st.selectbox("Pilih kolom numerik:", numeric_cols)
+        data = df[selected_col].dropna().values
+        st.dataframe(df)
+    else:
+        st.warning("Silakan upload file CSV.")
+        st.stop()
+
+else:
+    nama_file = buat_dataset_numerik()
+    df = pd.read_csv(nama_file)
+    st.success(f"Dataset otomatis '{nama_file}' berhasil dimuat.")
+    st.dataframe(df)
+    data = df["Nilai"].values
+
+# =======================
+# HASIL & VISUALISASI
+# =======================
+st.subheader("📊 Hasil Statistik")
+hasil_statistik = hitung_statistik(data)
+tampilkan_tabel_statistik(hasil_statistik)
+
+st.subheader("📉 Visualisasi Data")
+tab1, tab2 = st.tabs(["Histogram", "Boxplot"])
+with tab1:
+    tampilkan_histogram(data)
+with tab2:
+    tampilkan_boxplot(data)
+
+st.markdown("---")
+st.caption("Dibuat untuk memenuhi UAS - Aplikasi Simulasi Statistik Deskriptif | Teknik Informatika | 2025")
