@@ -6,10 +6,40 @@ import matplotlib.pyplot as plt
 from scipy import stats
 import os
 
+# =======================
+# PENGATURAN LAYOUT & TEMA
+# =======================
 st.set_page_config(page_title="Statistik Produksi Teknik Industri", layout="centered")
 
+# Tambahan CSS untuk mempercantik UI
+st.markdown("""
+    <style>
+        .main {background-color: #fdfcfb;}
+        .block-container {padding: 2rem 2rem 1rem;}
+        .stButton>button {
+            background-color: #ff8c00;
+            color: white;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+        .stRadio > div {
+            background-color: #f0f0f0;
+            padding: 10px;
+            border-radius: 10px;
+        }
+        .stDataFrame, .stTable {
+            background-color: white;
+            border-radius: 10px;
+            padding: 10px;
+        }
+        h1, h2, h3 {
+            color: #ff8c00;
+        }
+    </style>
+""", unsafe_allow_html=True)
+
 # =======================
-# FUNGSI STATISTIK
+# FUNGSI STATISTIK & VISUAL
 # =======================
 def hitung_statistik(data):
     mean_val = np.mean(data)
@@ -56,9 +86,17 @@ def buat_dataset_produksi():
     return nama_file
 
 # =======================
-# SIDEBAR & JUDUL
+# TAMPILAN JUDUL & SIDEBAR
 # =======================
-st.sidebar.title("🏭 Statistik Produksi Harian")
+st.title("🏭 Statistik Produksi Harian per Shift")
+st.markdown("### 📦 Teknik Industri | UAS Aplikasi Simulasi Statistik Deskriptif")
+
+st.markdown("""
+Selamat datang di aplikasi analisis **output produksi harian per shift**.  
+Aplikasi ini akan membantu menganalisis **stabilitas dan performa produksi barang** menggunakan statistik deskriptif.
+""")
+
+st.sidebar.title("🔧 Menu Navigasi")
 st.sidebar.markdown("""
 Aplikasi ini digunakan untuk menganalisis data produksi harian di pabrik atau lini manufaktur.
 
@@ -78,8 +116,6 @@ Aplikasi ini digunakan untuk menganalisis data produksi harian di pabrik atau li
 - Statistik produksi  
 - Grafik histogram & boxplot
 """)
-
-st.title("📈 Simulasi Statistik Produksi Harian per Shift")
 
 # =======================
 # PENJELASAN TEORI
@@ -168,16 +204,16 @@ else:
 # =======================
 # HASIL & VISUALISASI
 # =======================
-st.subheader("📊 Hasil Statistik Produksi")
+st.subheader("📊 Ringkasan Statistik Produksi")
 hasil_statistik = hitung_statistik(data)
 tampilkan_tabel_statistik(hasil_statistik)
 
-st.subheader("📉 Visualisasi Data")
-tab1, tab2 = st.tabs(["Histogram", "Boxplot"])
+st.subheader("📈 Visualisasi Distribusi Produksi")
+tab1, tab2 = st.tabs(["📊 Histogram", "📦 Boxplot"])
 with tab1:
     tampilkan_histogram(data)
 with tab2:
     tampilkan_boxplot(data)
 
 st.markdown("---")
-st.caption("Disusun untuk UAS - Statistik Produksi | Teknik Industri | 2025")
+st.info("📌 Disusun untuk UAS Teknik Industri | 2025 - Oleh: [Nama Anda]")
