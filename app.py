@@ -4,14 +4,16 @@ import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
 from scipy import stats
-import os
 
+# Konfigurasi halaman
 st.set_page_config(page_title="Simulasi Statistik Deskriptif", layout="centered")
 
 # =======================
-# FUNGSI BANTU
+# FUNGSI BANTU OPSIONAL
 # =======================
+
 def hitung_statistik(data):
+    """Mengembalikan dictionary statistik deskriptif"""
     mean_val = np.mean(data)
     median_val = np.median(data)
     mode_val = stats.mode(data, keepdims=True)[0][0]
@@ -26,6 +28,7 @@ def hitung_statistik(data):
     }
 
 def tampilkan_tabel_statistik(stats_dict):
+    """Menampilkan dataframe statistik dalam Streamlit"""
     df_result = pd.DataFrame({
         "Ukuran Statistik": list(stats_dict.keys()),
         "Nilai": list(stats_dict.values())
@@ -44,69 +47,46 @@ def tampilkan_boxplot(data):
     ax2.set_title("Boxplot Data")
     st.pyplot(fig2)
 
-def buat_dataset_numerik():
-    nama_file = "data_numerik.csv"
-    if not os.path.exists(nama_file):
-        data = {
-            "No": list(range(1, 11)),
-            "Nama": ["Andi", "Budi", "Cici", "Dina", "Eka", "Fani", "Gilang", "Hana", "Indra", "Joko"],
-            "Nilai": [78, 82, 90, 75, 88, 85, 80, 92, 84, 89]
-        }
-        df = pd.DataFrame(data)
-        df.to_csv(nama_file, index=False)
-    return nama_file
-
 # =======================
 # UI APLIKASI
 # =======================
+
+# Sidebar - Dokumentasi
 st.sidebar.title("📊 Simulasi Statistik Deskriptif")
 st.sidebar.markdown("""
 Aplikasi ini menghitung dan memvisualisasikan statistik deskriptif dasar:
 
 **Ukuran yang dihitung:**
-- Mean
+- Mean (Rata-rata)
 - Median
 - Modus
 - Varians
 - Standar Deviasi
 
 **Fitur Input:**
-- Input data manual (nama, nilai)
+- Input data manual
 - Upload file CSV
-- Gunakan dataset otomatis
 
 **Output:**
-- Tabel statistik
-- Histogram dan boxplot
+- Tabel hasil statistik
+- Grafik histogram & boxplot
 """)
 
+# Judul
 st.title("📈 Aplikasi Simulasi Statistik Deskriptif")
 
 # PILIHAN INPUT
-input_mode = st.radio("Pilih metode input data:", ["Input Manual (Nama,Nilai)", "Upload File CSV", "Gunakan Contoh Otomatis"])
-
+input_mode = st.radio("Pilih metode input data:", ["Input Manual", "Upload File CSV"])
 data = None
 
-if input_mode == "Input Manual (Nama,Nilai)":
-    manual_input = st.text_area("Masukkan data (format: Nama,Nilai per baris):", "Andi,78\nBudi,85\nCici,90")
-    
+if input_mode == "Input Manual":
+    manual_input = st.text_area("Masukkan data numerik (pisahkan dengan koma):", "10, 15, 12, 18, 20, 20, 21")
     try:
-        rows = [row.strip() for row in manual_input.strip().split("\n") if row.strip()]
-        nama, nilai = [], []
-        for row in rows:
-            parts = row.split(",")
-            if len(parts) != 2:
-                raise ValueError("Format harus: Nama,Nilai")
-            nama.append(parts[0].strip())
-            nilai.append(float(parts[1].strip()))
-        df = pd.DataFrame({"Nama": nama, "Nilai": nilai})
-        st.dataframe(df)
-        data = df["Nilai"].values
-    except Exception as e:
-        st.error(f"Terjadi kesalahan: {e}")
+        data = np.array([float(i.strip()) for i in manual_input.split(",") if i.strip() != ""])
+    except:
+        st.error("Format data tidak valid. Gunakan angka yang dipisahkan koma.")
         st.stop()
-
-elif input_mode == "Upload File CSV":
+else:
     uploaded_file = st.file_uploader("Upload file CSV", type=["csv"])
     if uploaded_file is not None:
         df = pd.read_csv(uploaded_file)
@@ -116,25 +96,20 @@ elif input_mode == "Upload File CSV":
             st.stop()
         selected_col = st.selectbox("Pilih kolom numerik:", numeric_cols)
         data = df[selected_col].dropna().values
-        st.dataframe(df)
     else:
-        st.warning("Silakan upload file CSV.")
+        st.warning("Silakan upload file CSV untuk melanjutkan.")
         st.stop()
 
-else:  # Data otomatis
-    nama_file = buat_dataset_numerik()
-    df = pd.read_csv(nama_file)
-    st.success(f"Dataset otomatis '{nama_file}' berhasil dimuat.")
-    st.dataframe(df)
-    data = df["Nilai"].values
+# =======================
+# OUTPUT STATISTIK & VISUAL
+# =======================
 
-# =======================
-# OUTPUT
-# =======================
+# Hitung Statistik
 st.subheader("📊 Hasil Statistik")
 hasil_statistik = hitung_statistik(data)
 tampilkan_tabel_statistik(hasil_statistik)
 
+# Visualisasi
 st.subheader("📉 Visualisasi Data")
 tab1, tab2 = st.tabs(["Histogram", "Boxplot"])
 with tab1:
@@ -142,5 +117,6 @@ with tab1:
 with tab2:
     tampilkan_boxplot(data)
 
+# Penutup
 st.markdown("---")
-st.caption("Dibuat untuk memenuhi UAS - Aplikasi Simulasi Statistik Deskriptif | Teknik | 2025")
+st.caption("Dibuat untuk memenuhi UAS - Aplikasi Simulasi Statistik Deskriptif | Oleh Mahasiswa Teknik")
