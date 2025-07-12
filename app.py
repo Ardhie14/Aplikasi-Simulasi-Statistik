@@ -6,13 +6,10 @@ import matplotlib.pyplot as plt
 from scipy import stats
 import os
 
-# =======================
-# SETUP HALAMAN
-# =======================
-st.set_page_config(page_title="Simulasi Statistik Deskriptif - ML", layout="centered")
+st.set_page_config(page_title="Statistik Teknik Mesin", layout="centered")
 
 # =======================
-# FUNGSI BANTU
+# FUNGSI PERHITUNGAN
 # =======================
 def hitung_statistik(data):
     mean_val = np.mean(data)
@@ -37,22 +34,22 @@ def tampilkan_tabel_statistik(stats_dict):
 
 def tampilkan_histogram(data):
     fig, ax = plt.subplots()
-    sns.histplot(data, kde=True, bins=10, color="skyblue", ax=ax)
-    ax.set_title("Histogram Data")
+    sns.histplot(data, kde=True, bins=10, color="steelblue", ax=ax)
+    ax.set_title("Histogram Data Pengujian Mesin")
     st.pyplot(fig)
 
 def tampilkan_boxplot(data):
     fig2, ax2 = plt.subplots()
-    sns.boxplot(data, color="lightgreen", ax=ax2)
-    ax2.set_title("Boxplot Data")
+    sns.boxplot(data, color="lightcoral", ax=ax2)
+    ax2.set_title("Boxplot Pengujian")
     st.pyplot(fig2)
 
-def buat_dataset_numerik():
-    nama_file = "ml_metrics_sample.csv"
+def buat_dataset_mesin():
+    nama_file = "mesin_uji_sample.csv"
     if not os.path.exists(nama_file):
         data = {
-            "Fitur": ["Akurasi", "Presisi", "Recall", "F1-Score", "Loss"],
-            "Nilai": [0.91, 0.88, 0.84, 0.86, 0.12]
+            "Parameter": ["Temperatur", "Tekanan", "Putaran", "Getaran", "Efisiensi"],
+            "Nilai": [85.0, 2.5, 1400, 0.02, 88.5]
         }
         df = pd.DataFrame(data)
         df.to_csv(nama_file, index=False)
@@ -61,97 +58,96 @@ def buat_dataset_numerik():
 # =======================
 # SIDEBAR & JUDUL
 # =======================
-st.sidebar.title("📊 Statistik Deskriptif - Machine Learning")
+st.sidebar.title("🛠️ Statistik Teknik Mesin")
 st.sidebar.markdown("""
-Aplikasi ini menghitung dan memvisualisasikan statistik deskriptif untuk data hasil evaluasi model:
+Aplikasi ini digunakan untuk analisis statistik dari hasil pengujian sistem mekanis seperti:
 
-**Ukuran yang dihitung:**
-- Mean
-- Median
-- Modus
-- Varians
-- Standar Deviasi
+- Uji tekanan dan temperatur
+- Efisiensi sistem termal
+- Getaran mesin
+- Kecepatan rotasi poros
 
-**Input:**
-- Data manual (Fitur, Nilai)
-- File CSV
-- Dataset contoh
+**Input:**  
+- Data manual (Parameter, Nilai)  
+- Upload CSV  
+- Dataset simulasi otomatis
 
-**Visualisasi:**
-- Histogram & Boxplot
+**Output:**  
+- Tabel statistik  
+- Histogram & Boxplot visualisasi
 """)
 
-st.title("📈 Simulasi Statistik Deskriptif - Data Machine Learning")
+st.title("📊 Simulasi Statistik Deskriptif - Teknik Mesin")
 
 # =======================
-# PENJELASAN TEORI
+# PENJELASAN TEORI MESIN
 # =======================
-with st.expander("🧠 Konsep Statistik Deskriptif dalam Matematika Teknik Informatika (ML)"):
+with st.expander("📘 Konsep Statistik dalam Teknik Mesin"):
     st.markdown(r"""
-### 🎯 Relevansi dalam Machine Learning:
+### 🔧 Penerapan Statistik di Teknik Mesin:
 
-Statistik deskriptif membantu:
-- **Evaluasi performa model (akurasi, presisi, recall, loss, dll.)**
-- **Analisis distribusi error**
-- **Preprocessing & normalisasi data**
-- **Menganalisis hasil tuning hyperparameter**
+Statistik deskriptif digunakan untuk menganalisis hasil pengujian seperti:
+- **Temperatur operasi mesin**
+- **Tekanan fluida**
+- **Kecepatan rotasi poros**
+- **Efisiensi energi sistem**
+- **Getaran dan noise mesin**
 
 ---
 
 ### 📐 Ukuran Statistik:
 
 - **Mean (Rata-rata)**  
-  \( \bar{x} = \frac{1}{n} \sum_{i=1}^n x_i \)  
-  ➤ Rata-rata dari semua metrik.
+  Rumus: \( \bar{x} = \frac{1}{n} \sum_{i=1}^n x_i \)  
+  ➤ Menunjukkan rata-rata pengukuran alat.
 
 - **Median**  
-  ➤ Nilai tengah, tahan terhadap outlier.
+  ➤ Nilai tengah — tahan terhadap nilai ekstrem saat uji coba.
 
 - **Modus**  
-  ➤ Nilai paling sering muncul.
+  ➤ Nilai yang sering muncul saat pengukuran berulang.
 
 - **Varians (s²)**  
-  \( s^2 = \frac{1}{n-1} \sum (x_i - \bar{x})^2 \)  
-  ➤ Mengukur sebaran metrik.
+  Rumus: \( s^2 = \frac{1}{n-1} \sum (x_i - \bar{x})^2 \)  
+  ➤ Menyatakan sebaran dari hasil uji performa.
 
 - **Standar Deviasi (s)**  
   \( s = \sqrt{s^2} \)  
-  ➤ Seberapa jauh nilai menyimpang dari rata-rata.
+  ➤ Stabilitas data pengukuran sistem mekanik.
 
 ---
 
 ### 📊 Visualisasi:
-- **Histogram**: Distribusi nilai performa
-- **Boxplot**: Deteksi outlier dalam hasil eksperimen
+- **Histogram** → distribusi hasil pengujian
+- **Boxplot** → identifikasi anomali (outlier)
 
 ---
-
-*Digunakan dalam: evaluasi model, eksperimen hyperparameter, riset ML, analitik sistem cerdas.*
+*Statistik menjadi dasar dalam proses kontrol kualitas, maintenance prediktif, dan riset sistem mekanik.*
 """)
 
 # =======================
 # INPUT PILIHAN
 # =======================
 input_mode = st.radio("Pilih metode input data:", [
-    "Input Manual (Fitur,Nilai - ML)", 
-    "Upload File CSV", 
+    "Input Manual (Parameter, Nilai - Mesin)",
+    "Upload File CSV",
     "Gunakan Contoh Otomatis"
 ])
 data = None
 
-if input_mode == "Input Manual (Fitur,Nilai - ML)":
-    manual_input = st.text_area("Masukkan data metrik ML (format: Fitur,Nilai per baris):", 
-                                 "Akurasi,0.91\nPresisi,0.88\nRecall,0.84\nF1-Score,0.86\nLoss,0.12")
+if input_mode == "Input Manual (Parameter, Nilai - Mesin)":
+    manual_input = st.text_area("Masukkan data uji mesin (format: Parameter,Nilai per baris):",
+                                 "Temperatur,85.0\nTekanan,2.5\nPutaran,1400\nGetaran,0.02\nEfisiensi,88.5")
     try:
         rows = [row.strip() for row in manual_input.strip().split("\n") if row.strip()]
-        fitur, nilai = [], []
+        param, nilai = [], []
         for row in rows:
             parts = row.split(",")
             if len(parts) != 2:
-                raise ValueError("Format harus: Fitur,Nilai")
-            fitur.append(parts[0].strip())
+                raise ValueError("Format harus: Parameter,Nilai")
+            param.append(parts[0].strip())
             nilai.append(float(parts[1].strip()))
-        df = pd.DataFrame({"Fitur": fitur, "Nilai": nilai})
+        df = pd.DataFrame({"Parameter": param, "Nilai": nilai})
         st.dataframe(df)
         data = df["Nilai"].values
     except Exception as e:
@@ -159,12 +155,12 @@ if input_mode == "Input Manual (Fitur,Nilai - ML)":
         st.stop()
 
 elif input_mode == "Upload File CSV":
-    uploaded_file = st.file_uploader("Upload file CSV", type=["csv"])
+    uploaded_file = st.file_uploader("Upload file CSV hasil pengujian", type=["csv"])
     if uploaded_file is not None:
         df = pd.read_csv(uploaded_file)
         numeric_cols = df.select_dtypes(include=np.number).columns.tolist()
         if not numeric_cols:
-            st.error("Tidak ditemukan kolom numerik dalam file.")
+            st.error("Tidak ditemukan kolom numerik.")
             st.stop()
         selected_col = st.selectbox("Pilih kolom numerik:", numeric_cols)
         data = df[selected_col].dropna().values
@@ -174,7 +170,7 @@ elif input_mode == "Upload File CSV":
         st.stop()
 
 else:
-    nama_file = buat_dataset_numerik()
+    nama_file = buat_dataset_mesin()
     df = pd.read_csv(nama_file)
     st.success(f"Dataset otomatis '{nama_file}' berhasil dimuat.")
     st.dataframe(df)
@@ -183,11 +179,11 @@ else:
 # =======================
 # HASIL & VISUALISASI
 # =======================
-st.subheader("📊 Hasil Statistik")
+st.subheader("📈 Hasil Statistik Pengujian")
 hasil_statistik = hitung_statistik(data)
 tampilkan_tabel_statistik(hasil_statistik)
 
-st.subheader("📉 Visualisasi Data")
+st.subheader("📉 Visualisasi")
 tab1, tab2 = st.tabs(["Histogram", "Boxplot"])
 with tab1:
     tampilkan_histogram(data)
@@ -195,4 +191,4 @@ with tab2:
     tampilkan_boxplot(data)
 
 st.markdown("---")
-st.caption("Dibuat untuk UAS - Aplikasi Simulasi Statistik Deskriptif | Teknik Informatika | 2025")
+st.caption("Disusun untuk UAS - Aplikasi Statistik Deskriptif | Teknik Mesin | 2025")
