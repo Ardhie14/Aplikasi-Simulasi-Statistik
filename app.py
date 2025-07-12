@@ -104,4 +104,4 @@ Semua perhitungan dilakukan **otomatis dan presisi tinggi**. Hasil visualisasi (
 
 # Footer
 st.markdown("---")
-st.markdown("<center><small>🛠️ Dibuat oleh Mahasiswa Teknik Industri - UAS Aplikasi Statistik Deskriptif</small></center>", unsafe_allow_html=True)
+st.markdown("<center><small>🛠️ Dibuat oleh Mahasiswa Teknik Informatika Universitas Pelita Bangsa - UAS Aplikasi Statistik Deskriptif</small></center>", unsafe_allow_html=True)
