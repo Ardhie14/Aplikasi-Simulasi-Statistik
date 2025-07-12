@@ -13,8 +13,8 @@ st.set_page_config(page_title="Statistik Produksi Harian", layout="wide")
 with st.sidebar:
     selected = option_menu(
         "Menu",
-        ["🏭 Beranda", "📊 Statistik Produksi", "📈 Visualisasi"],
-        icons=["house", "bar-chart", "graph-up"],
+        ["🏭 Beranda", "📊 Analisis Produksi"],
+        icons=["house", "bar-chart"],
         default_index=0,
     )
 
@@ -47,9 +47,9 @@ if selected == "🏭 Beranda":
     """)
 
 # --------------------------
-# Halaman 2: Statistik Produksi
+# Halaman 2: Analisis Produksi
 # --------------------------
-elif selected == "📊 Statistik Produksi":
+elif selected == "📊 Analisis Produksi":
     st.header("📋 Input Data Output Produksi Gearbox Motor")
 
     input_type = st.radio("Pilih metode input data:", ["Input Manual", "Upload CSV"])
@@ -80,10 +80,17 @@ elif selected == "📊 Statistik Produksi":
             st.warning("Silakan upload file CSV terlebih dahulu.")
             st.stop()
 
+    # --------------------------
+    # Tabel Data
+    # --------------------------
     st.success("✅ Data berhasil diproses")
-    st.write(df)
+    st.subheader("📋 Tabel Output Produksi Gearbox Motor")
+    st.dataframe(df, use_container_width=True)
 
-    st.markdown("### 📌 Statistik Deskriptif Produksi")
+    # --------------------------
+    # Statistik Deskriptif
+    # --------------------------
+    st.subheader("📌 Statistik Deskriptif Produksi")
     st.write(f"**Mean (Rata-rata):** {np.mean(df['Unit Produksi']):.2f} unit")
     st.write(f"**Median:** {np.median(df['Unit Produksi']):.2f} unit")
     try:
@@ -93,24 +100,19 @@ elif selected == "📊 Statistik Produksi":
     st.write(f"**Varians:** {np.var(df['Unit Produksi'], ddof=1):.2f}")
     st.write(f"**Standar Deviasi:** {np.std(df['Unit Produksi'], ddof=1):.2f}")
 
-# --------------------------
-# Halaman 3: Visualisasi
-# --------------------------
-elif selected == "📈 Visualisasi":
-    st.header("📊 Visualisasi Produksi Harian – Gearbox Motor")
-
-    if 'df' not in locals():
-        st.warning("Silakan input data terlebih dahulu di menu Statistik Produksi.")
-        st.stop()
+    # --------------------------
+    # Visualisasi
+    # --------------------------
+    st.subheader("📊 Visualisasi Produksi Harian")
 
     col1, col2 = st.columns(2)
 
     with col1:
-        st.subheader("Histogram Produksi")
+        st.markdown("#### Histogram Produksi")
         fig_hist = px.histogram(df, x="Unit Produksi", nbins=7, title="Distribusi Output Produksi")
         st.plotly_chart(fig_hist, use_container_width=True)
 
     with col2:
-        st.subheader("Boxplot Produksi")
+        st.markdown("#### Boxplot Produksi")
         fig_box = px.box(df, y="Unit Produksi", title="Penyebaran Produksi Harian")
         st.plotly_chart(fig_box, use_container_width=True)
