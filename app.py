@@ -1,128 +1,183 @@
-
 import streamlit as st
 import pandas as pd
 import numpy as np
-import plotly.express as px
-from statistics import mode
-from streamlit_option_menu import option_menu
+import seaborn as sns
+import matplotlib.pyplot as plt
+from scipy import stats
+import os
 
-st.set_page_config(page_title="Statistik Produksi Harian", layout="wide")
+st.set_page_config(page_title="Statistik Produksi Teknik Industri", layout="centered")
 
-# --------------------------
-# Sidebar Navigation
-# --------------------------
-with st.sidebar:
-    selected = option_menu(
-        "Menu",
-        ["🏭 Beranda", "📊 Analisis Produksi"],
-        icons=["house", "bar-chart"],
-        default_index=0,
-    )
+# =======================
+# FUNGSI STATISTIK
+# =======================
+def hitung_statistik(data):
+    mean_val = np.mean(data)
+    median_val = np.median(data)
+    mode_val = stats.mode(data, keepdims=True)[0][0]
+    var_val = np.var(data, ddof=1)
+    std_val = np.std(data, ddof=1)
+    return {
+        "Mean": mean_val,
+        "Median": median_val,
+        "Modus": mode_val,
+        "Varians": var_val,
+        "Standar Deviasi": std_val
+    }
 
-# --------------------------
-# Styling Header
-# --------------------------
-st.markdown("""
-    <style>
-        .main {background-color:#f5f5f5;}
-        h1, h2, h3 {color:#1B2631;}
-        .stApp {padding:2rem;}
-    </style>
-""", unsafe_allow_html=True)
+def tampilkan_tabel_statistik(stats_dict):
+    df_result = pd.DataFrame({
+        "Ukuran Statistik": list(stats_dict.keys()),
+        "Nilai": list(stats_dict.values())
+    })
+    st.dataframe(df_result, use_container_width=True)
 
-# --------------------------
-# Halaman 1: Beranda
-# --------------------------
-if selected == "🏭 Beranda":
-    st.title("📦 Aplikasi Statistik Produksi Harian")
-    st.markdown("### Produk: **Gearbox Motor** – Analisis Output Produksi per Shift (7 Hari)")
-    st.markdown("""
-    Aplikasi ini digunakan untuk menganalisis data **jumlah unit yang diproduksi** setiap hari selama satu minggu.
+def tampilkan_histogram(data):
+    fig, ax = plt.subplots()
+    sns.histplot(data, kde=True, bins=10, color="orange", ax=ax)
+    ax.set_title("Distribusi Output Produksi per Shift")
+    st.pyplot(fig)
 
-    Cocok digunakan untuk:
-    - Kontrol produksi harian
-    - Evaluasi efisiensi shift kerja
-    - Monitoring variasi produksi
+def tampilkan_boxplot(data):
+    fig2, ax2 = plt.subplots()
+    sns.boxplot(data, color="gold", ax=ax2)
+    ax2.set_title("Boxplot Jumlah Produksi")
+    st.pyplot(fig2)
 
-    Gunakan menu di samping untuk memulai analisis.
-    """)
+def buat_dataset_produksi():
+    nama_file = "produksi_shift_sample.csv"
+    if not os.path.exists(nama_file):
+        data = {
+            "Barang": ["Botol Plastik", "Baut", "Roda Baja", "Pipa Besi", "Gear Motor"],
+            "Jumlah Produksi": [1200, 980, 1100, 950, 1000]
+        }
+        df = pd.DataFrame(data)
+        df.to_csv(nama_file, index=False)
+    return nama_file
 
-# --------------------------
-# Halaman 2: Analisis Produksi
-# --------------------------
-elif selected == "📊 Analisis Produksi":
-    st.header("📋 Input Data Output Produksi Gearbox Motor")
+# =======================
+# SIDEBAR & JUDUL
+# =======================
+st.sidebar.title("🏭 Statistik Produksi Harian")
+st.sidebar.markdown("""
+Aplikasi ini digunakan untuk menganalisis data produksi harian di pabrik atau lini manufaktur.
 
-    input_type = st.radio("Pilih metode input data:", ["Input Manual", "Upload CSV"])
+**Contoh Barang:**
+- Botol Plastik
+- Baut dan Mur
+- Roda Baja
+- Komponen Gear
+- Produk Pipa
 
-    if input_type == "Input Manual":
-        st.markdown("Masukkan jumlah unit produksi harian selama 7 hari (pisahkan dengan koma)")
-        data_input = st.text_area("Contoh: 320, 315, 330, 340, 325, 310, 335", "320, 315, 330, 340, 325, 310, 335")
-        try:
-            data = list(map(int, data_input.split(",")))
-            if len(data) != 7:
-                st.error("⚠️ Harus terdiri dari 7 nilai (1 minggu).")
-                st.stop()
-            df = pd.DataFrame({
-                "Hari": ["Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu", "Minggu"],
-                "Unit Produksi": data
-            })
-        except:
-            st.error("Format data salah. Pastikan hanya angka dan koma.")
+**Input:**  
+- Manual (Barang, Jumlah)  
+- Upload CSV  
+- Dataset otomatis
+
+**Output:**  
+- Statistik produksi  
+- Grafik histogram & boxplot
+""")
+
+st.title("📈 Simulasi Statistik Produksi Harian per Shift")
+
+# =======================
+# PENJELASAN TEORI
+# =======================
+with st.expander("📘 Konsep Statistik dalam Teknik Industri"):
+    st.markdown(r"""
+### 🏭 Peran Statistik di Industri:
+
+Statistik digunakan untuk:
+- Mengukur konsistensi hasil produksi
+- Menganalisis efisiensi lini per shift
+- Menilai kebutuhan perbaikan pada sistem produksi
+- Dasar pengambilan keputusan pada manajemen industri
+
+---
+
+### 📐 Ukuran Statistik:
+
+- **Mean (Rata-rata):** jumlah produksi rata-rata per shift  
+- **Median:** nilai tengah dari distribusi  
+- **Modus:** jumlah produksi yang paling sering muncul  
+- **Varians & Standar Deviasi:** mengukur stabilitas atau variasi produksi
+
+---
+
+### 📊 Visualisasi:
+- **Histogram:** distribusi output barang
+- **Boxplot:** deteksi anomali dalam jumlah produksi
+
+---
+
+*Statistik membantu memastikan proses industri berjalan stabil, efisien, dan dapat dikontrol.*
+""")
+
+# =======================
+# INPUT DATA
+# =======================
+input_mode = st.radio("Pilih metode input data:", [
+    "Input Manual (Barang, Jumlah)",
+    "Upload File CSV",
+    "Gunakan Contoh Otomatis"
+])
+data = None
+
+if input_mode == "Input Manual (Barang, Jumlah)":
+    manual_input = st.text_area("Masukkan data produksi (format: Barang,Jumlah per baris):",
+                                 "Botol Plastik,1200\nBaut,980\nRoda Baja,1100\nPipa Besi,950\nGear Motor,1000")
+    try:
+        rows = [row.strip() for row in manual_input.strip().split("\n") if row.strip()]
+        barang, jumlah = [], []
+        for row in rows:
+            parts = row.split(",")
+            if len(parts) != 2:
+                raise ValueError("Format harus: Barang,Jumlah")
+            barang.append(parts[0].strip())
+            jumlah.append(float(parts[1].strip()))
+        df = pd.DataFrame({"Barang": barang, "Jumlah Produksi": jumlah})
+        st.dataframe(df)
+        data = df["Jumlah Produksi"].values
+    except Exception as e:
+        st.error(f"Terjadi kesalahan: {e}")
+        st.stop()
+
+elif input_mode == "Upload File CSV":
+    uploaded_file = st.file_uploader("Upload file CSV produksi", type=["csv"])
+    if uploaded_file is not None:
+        df = pd.read_csv(uploaded_file)
+        numeric_cols = df.select_dtypes(include=np.number).columns.tolist()
+        if not numeric_cols:
+            st.error("Tidak ditemukan kolom numerik.")
             st.stop()
+        selected_col = st.selectbox("Pilih kolom numerik:", numeric_cols)
+        data = df[selected_col].dropna().values
+        st.dataframe(df)
     else:
-        uploaded_file = st.file_uploader("Upload file CSV", type=["csv"])
-        if uploaded_file is not None:
-            df = pd.read_csv(uploaded_file)
-            if "Unit Produksi" not in df.columns:
-                st.error("CSV harus mengandung kolom 'Unit Produksi'")
-                st.stop()
-        else:
-            st.warning("Silakan upload file CSV terlebih dahulu.")
-            st.stop()
+        st.warning("Silakan upload file CSV.")
+        st.stop()
 
-    # --------------------------
-    # Tabel Data
-    # --------------------------
-    st.success("✅ Data berhasil diproses")
-    st.subheader("📋 Tabel Output Produksi Gearbox Motor")
-    st.dataframe(df, use_container_width=True)
+else:
+    nama_file = buat_dataset_produksi()
+    df = pd.read_csv(nama_file)
+    st.success(f"Dataset otomatis '{nama_file}' berhasil dimuat.")
+    st.dataframe(df)
+    data = df["Jumlah Produksi"].values
 
-    # --------------------------
-    # Statistik Deskriptif
-    # --------------------------
-    st.markdown("### 📌 Statistik Deskriptif Produksi")
-    st.markdown(f"""
-    <div style='background-color:#EBF5FB; padding: 15px; border-radius: 10px'>
-    <h4 style='color:#2E86C1;'>📊 Rangkuman Statistik Gearbox Motor</h4>
-    <ul>
-        <li><b>Mean (Rata-rata):</b> {np.mean(df['Unit Produksi']):.2f} unit</li>
-        <li><b>Median:</b> {np.median(df['Unit Produksi']):.2f} unit</li>
-        <li><b>Modus:</b> {"Tidak ada (multimodal)" if len(set(df['Unit Produksi'])) == len(df['Unit Produksi']) else mode(df['Unit Produksi'])}</li>
-        <li><b>Varians:</b> {np.var(df['Unit Produksi'], ddof=1):.2f}</li>
-        <li><b>Standar Deviasi:</b> {np.std(df['Unit Produksi'], ddof=1):.2f}</li>
-    </ul>
-    </div>
-    """, unsafe_allow_html=True)
+# =======================
+# HASIL & VISUALISASI
+# =======================
+st.subheader("📊 Hasil Statistik Produksi")
+hasil_statistik = hitung_statistik(data)
+tampilkan_tabel_statistik(hasil_statistik)
 
-    # --------------------------
-    # Visualisasi
-    # --------------------------
-    st.markdown("### 📊 Visualisasi Produksi Harian")
-    st.markdown("Analisis grafik berikut dapat membantu mendeteksi pola distribusi dan penyebaran produksi harian.")
+st.subheader("📉 Visualisasi Data")
+tab1, tab2 = st.tabs(["Histogram", "Boxplot"])
+with tab1:
+    tampilkan_histogram(data)
+with tab2:
+    tampilkan_boxplot(data)
 
-    col1, col2 = st.columns(2)
-
-    with col1:
-        with st.container():
-            st.markdown("#### 📉 Histogram Produksi")
-            st.caption("Menunjukkan distribusi frekuensi output produksi dalam satu minggu.")
-            fig_hist = px.histogram(df, x="Unit Produksi", nbins=7, title="Distribusi Output Produksi")
-            st.plotly_chart(fig_hist, use_container_width=True)
-
-    with col2:
-        with st.container():
-            st.markdown("#### 📦 Boxplot Produksi")
-            st.caption("Menunjukkan persebaran dan potensi outlier pada data produksi.")
-            fig_box = px.box(df, y="Unit Produksi", title="Penyebaran Produksi Harian")
-            st.plotly_chart(fig_box, use_container_width=True)
+st.markdown("---")
+st.caption("Disusun untuk UAS - Statistik Produksi | Teknik Industri | 2025")
