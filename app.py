@@ -79,7 +79,19 @@ with col2:
     ax2.set_ylabel("Output Produksi")
     st.pyplot(fig2)
 
-# Penjelasan Konsep Matematika
+# 🔽 DESKRIPSI KHUSUS: PT SUKA MAJU - PRODUKSI KNALPOT
+st.subheader("🏭 Studi Kasus: Produksi Knalpot di PT Suka Maju")
+st.markdown("""
+PT Suka Maju adalah perusahaan manufaktur otomotif yang memproduksi **knalpot kendaraan bermotor**. Dalam satu minggu terakhir, tim produksi ingin mengetahui seberapa stabil hasil produksi harian dari ketiga shift kerja (Shift 1, 2, dan 3).
+
+Dengan menggunakan aplikasi ini, manajemen dapat:
+- Menginput data produksi harian knalpot dari tiap shift.
+- Melihat fluktuasi produksi melalui grafik.
+- Mengetahui **rata-rata, variansi, dan deviasi** sebagai indikator kestabilan produksi.
+Hasil analisis ini sangat berguna untuk mengevaluasi performa tiap shift dan mengidentifikasi potensi inefisiensi pada proses produksi.
+""")
+
+# 🧮 Penerapan Konsep Matematika
 st.subheader("🧮 Penerapan Konsep Matematika")
 st.markdown("""
 Aplikasi ini menerapkan **Statistik Deskriptif**, bagian dari Matematika Teknik Industri, untuk menganalisis output produksi harian:
@@ -92,7 +104,7 @@ Aplikasi ini menerapkan **Statistik Deskriptif**, bagian dari Matematika Teknik 
 Statistik ini penting dalam mengukur **kestabilan dan penyebaran hasil produksi antar shift**.
 """)
 
-# Kebenaran Perhitungan
+# ✅ Kebenaran Perhitungan
 st.subheader("✅ Kebenaran Perhitungan")
 st.markdown("""
 Perhitungan menggunakan pustaka Python terpercaya:
