@@ -10,7 +10,7 @@ st.set_page_config(page_title="Statistik Produksi Harian", layout="wide", page_i
 
 # Header Aplikasi
 st.markdown("<h1 style='text-align: center; color: #00BFFF;'>📦 Statistik Produksi Harian</h1>", unsafe_allow_html=True)
-st.markdown("<h4 style='text-align: center; color: #AAAAAA;'>Aplikasi Simulasi Statistik Deskriptif - Teknik Industri</h4>", unsafe_allow_html=True)
+st.markdown("<h4 style='text-align: center; color: #AAAAAA;'>Aplikasi Simulasi Statistik Deskriptif - Menghitung Output Hasil Produksi Selama 1 minggu</h4>", unsafe_allow_html=True)
 st.markdown("---")
 
 # Sidebar Input
