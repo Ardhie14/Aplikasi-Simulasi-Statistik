@@ -21,13 +21,3 @@ Aplikasi ini dikembangkan untuk **simulasi statistik deskriptif** dalam menganal
 - 🏭 Studi kasus produksi knalpot PT Suka Maju
 
 ## 🏗️ Struktur Proyek
-
-[csv terbaru.csv](https://github.com/user-attachments/files/21202633/csv.terbaru.csv)
-Tanggal,Shift 1,Shift 2,Shift 3
-7/1/2025,100,120,110
-7/2/2025,105,125,115
-7/3/2025,98,118,112
-7/4/2025,102,130,120
-7/5/2025,108,122,118
-7/6/2025,99,119,117
-7/7/2025,101,121,116
